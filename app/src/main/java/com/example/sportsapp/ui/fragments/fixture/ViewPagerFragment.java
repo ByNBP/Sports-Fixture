@@ -56,66 +56,50 @@ public class ViewPagerFragment extends Fragment {
 
     private ArrayList<FixtureModel> getFixtures(List<TeamModel> teamModels) {
         ArrayList<FixtureModel> fixtures = new ArrayList<>();
-
         int numberOfTeams = teamModels.size();
-
         // If odd number of teams add a "ghost".
         if (numberOfTeams % 2 != 0) {
             numberOfTeams++;
         }
-
         // Generate the fixtures using the cyclic algorithm.
         int totalWeek = numberOfTeams - 1;
         int matchesPerWeek = numberOfTeams / 2;
-
         for (int week = 0; week < totalWeek; week++) {
-
             String ghost = null;
             ArrayList<MatchModel> matches = new ArrayList<>();
-
             for (int match = 0; match < matchesPerWeek; match++) {
                 int home = (week + match) % (numberOfTeams - 1);
                 int away = (numberOfTeams - 1 - match + week) % (numberOfTeams - 1);
-
                 // Last team stays in the same place while the others
                 // rotate around it.
-
                 if (match == 0)
                     away = numberOfTeams - 1;
-
                 if (home == teamModels.size() | away == teamModels.size()) {
                     if (home != teamModels.size())
                         ghost = teamModels.get(home).getTeam();
                     else
                         ghost = teamModels.get(away).getTeam();
-
                     continue;
                 }
-
                 matches.add(new MatchModel(teamModels.get(home).getTeam(), teamModels.get(away).getTeam()));
             }
-
             if (ghost != null)
                 fixtures.add(new FixtureModel(ghost, matches));
             else
                 fixtures.add(new FixtureModel(matches));
         }
-
         // Interleave so that home and away games are fairly evenly dispersed.
         ArrayList<FixtureModel> interleaved = new ArrayList<>();
 
         int evn = 0;
         int odd = (numberOfTeams / 2);
-
         for (int i = 0; i < fixtures.size(); i++) {
             if (i % 2 == 0)
                 interleaved.add(fixtures.get(evn++));
             else
                 interleaved.add(fixtures.get(odd++));
         }
-
         fixtures = interleaved;
-
         // Last team can't be away for every game so flip them
         // to home on odd rounds.
         for (int roundNumber = 0; roundNumber < fixtures.size(); roundNumber++) {
@@ -124,7 +108,6 @@ public class ViewPagerFragment extends Fragment {
                 fixtures.get(roundNumber).setMatch(0, new MatchModel(matchModel.getAway(), matchModel.getHome()));
             }
         }
-
         ArrayList<FixtureModel> reverseFixtures = new ArrayList<>();
 
         for (FixtureModel fixture : fixtures) {
